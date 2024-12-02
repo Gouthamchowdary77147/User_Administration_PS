@@ -1,0 +1,24 @@
+do{
+$SAM= Read-Host "Enter the SAM account name of the user you want to promote:"
+try {
+    $SAMADInfo= Get-ADUser -Identity $SAM -Properties * -ErrorAction Stop
+    Write-Host "Found user with SAM account Name $SAM"
+}
+catch {
+    Write-Error $_
+}
+$NewTitle= Read-Host "Enter the new title of the user"
+$NewDepartment= Read-Host "Enter the new department of the user(Leave empty if no change)"
+$NewManager= Read-Host "Enter the SAM of the new manager"
+$EffectiveDate= Read-Host "Enter the promotion date"
+$JIRATicket= Read-Host "Enter JIRA ticket Number"
+$Information ="|| Promotion date: $EffectiveDate | JIRA Ticket: $JIRATicket ||"
+if($null -ne $NewDepartment)
+    {
+        Set-ADUser -Identity $SAMADInfo.SamAccountName -Title $NewTitle -Department $NewDepartment -Manager $NewManager -Add @(info=$Information)
+    }
+else {
+    Set-ADUser -Identity $SAMADInfo.SamAccountName -Title $NewTitle -Manager $NewManager -Add @(info=$Information)
+    }
+$Continue= Read-Host "Do you want to promote another user?(Y?N)"    
+} while ($Continue -eq "Y")
